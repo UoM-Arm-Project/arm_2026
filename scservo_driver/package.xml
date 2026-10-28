@@ -8,6 +8,7 @@
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
+  <depend>poker_interfaces</depend>
   
   <export>
     <build_type>ament_python</build_type>
