@@ -3,6 +3,8 @@ from rclpy.node import Node
 from scservo_sdk import PortHandler
 from poker_interfaces.msg import ServoCommand
 
+from threading import Lock
+
 class SCServoDriver(Node):
     def __init__(self):
         super().__init__('scservo_driver')
@@ -33,12 +35,25 @@ class SCServoDriver(Node):
 
         self.timer_ = self.create_timer(0.05, self._feedback_loop)
 
+        self._lock = Lock()
+
     # stump for servocommand subscription
-    def _cmd_cb():
+    def _cmd_cb(self, msg: ServoCommand):
+        self._lock.acquire()
+
+        count = len(msg.ids)
+        if count == 0:
+            return
+        
+
         return 0
 
     # stump for timer callback
-    def _feedback_loop():
+    def _feedback_loop(self):
+        # Try to lock; if busy writing, skip this feedback cycle to prioritize control smoothness
+        if self._lock.is_locked():
+            return
+
         return 0
 
 def main(args=None):
