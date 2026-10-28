@@ -5,6 +5,7 @@
   <version>0.0.0</version>
   <description>Python Driver for STS3215 Servos</description>
   <maintainer email="fgeorgelo.me@gmail.com">George</maintainer>
+  <maintainer email="faisallawan08@gmail.com">Faisal</maintainer>
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
