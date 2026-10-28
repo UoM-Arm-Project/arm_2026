@@ -15,17 +15,16 @@ class SCServoDriver(Node):
         self.baud = self.get_parameter('baud').value
         self.ids: list[int] = self.get_parameter('servo_ids').value
 
+        # NOTE: Check if this works, if not revert to previous commit
+        # driver source code setBaudRate() calls setupPort which opens the port
+
         portHandler = PortHandler(self.port)
-        if not portHandler.openPort():
-            self.get_logger().error(f"Failed to open port {self.port}")
-
-        # NOTE: this closes and reopens the port, leaving as is as it follows
-        # from the IMU example for scservo_sdk 
-        if not portHandler.setBaudRate(self.baud):
-            self.get_logger().error(f"Failed to set baud rate as {self.baud}")
-
-        self.get_logger().info(f"Opened port {self.port} at {self.baud}")
-
+        # opens port
+        if portHandler.setBaudRate(self.baud):
+            self.get_logger().info(f"Opened port {self.port} at {self.baud}")
+        else:
+            self.get_logger().error(f"Failed to open port {self.port} at {self.baud}")
+        
         self.sub_ = self.create_subscription(
             ServoCommand, '/servo_cmd', self._cmd_cb, 10)
 
