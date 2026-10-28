@@ -1,0 +1,41 @@
+.vscode/
+.venv
+venv/
+*.txt
+!requirements.txt
+__pycache__/
+.cache
+*.pyc
+.DS_Store
+.trae
+*.log
+.pytest_cache/
+docs/PLAN_*.md
+
+# Vision
+*.pt
+debug_inference/
+
+# ROS 2 build artifacts
+build/
+install/
+log/
+src/log/
+
+# Vision model weights directory
+# vision/
+vision/*.png
+vision/*.jpeg
+vision/*.jpg
+vision/*.pt
+vision/__pycache__/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Simulation artifacts
+debug_robot.urdf
+
+# Docs
+docs/diagrams/output/**/*.png
+docs/plans/
