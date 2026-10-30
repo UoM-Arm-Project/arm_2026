@@ -11,8 +11,8 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/ServoCommand.msg",
-  "msg/MotorFeedback.msg",
+  "msg/ServoCommand.msg"
+  "msg/MotorFeedback.msg"
   DEPENDENCIES builtin_interfaces
 )
 

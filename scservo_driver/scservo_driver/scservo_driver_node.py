@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from scservo_sdk import PortHandler
-from poker_interfaces.msg import ServoCommand
+from scservo_sdk.sms_sts import sms_sts as SmsStsPacketHandler
+from poker_interfaces.msg import ServoCommand, MotorFeedback
 
 from threading import Lock
 
@@ -21,6 +22,9 @@ class SCServoDriver(Node):
         # driver source code setBaudRate() calls setupPort which opens the port
 
         portHandler = PortHandler(self.port)
+        # initialise packet handler
+        self.packetHandler = SmsStsPacketHandler(PortHandler)
+
         # opens port
         if portHandler.setBaudRate(self.baud):
             self.get_logger().info(f"Opened port {self.port} at {self.baud}")
@@ -41,12 +45,12 @@ class SCServoDriver(Node):
     def _cmd_cb(self, msg: ServoCommand):
         self._lock.acquire()
 
-        count = len(msg.ids)
-        if count == 0:
+        if len(msg.ids) == 0:
             return
-        
 
-        return 0
+        for id, pos, speed, acceleration in \
+            zip(msg.ids, msg.position, msg.speed, msg.acceleration):
+            self.packetHandler.SyncWritePosEx(id, pos, speed, acceleration)
 
     # stump for timer callback
     def _feedback_loop(self):
@@ -54,7 +58,29 @@ class SCServoDriver(Node):
         if self._lock.is_locked():
             return
 
-        return 0
+        msg = MotorFeedback()
+        msg.stamp = self.get_clock().now()
+        msg.feedback_valid = True
+
+        for id in self.ids:
+            # read ONLY speed and position to save bus time
+            pos = self.packetHandler.ReadPos(id)
+            spd = self.packetHandler.ReadSpeed(id)
+
+            if pos == -1:
+                msg.feedback_valid = False
+
+            msg.servo_ids.append(id)
+            msg.positions.append(pos)
+            msg.speeds.append(spd)
+
+            # fill others with 0 to save bandwidth
+            msg.loads.append(0)
+            msg.voltages.append(0)
+            msg.temperatures.append(0)
+
+        self.pub_feedback_.publish(msg)
+            
 
 def main(args=None):
     rclpy.init(args=args)
