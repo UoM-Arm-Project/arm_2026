@@ -1,0 +1,9 @@
+build/
+debug_robot.urdf
+install/
+log/
+.venv/
+.vscode/
+*.pyc
+
+__pycache__/
